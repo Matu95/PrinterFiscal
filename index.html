@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>pyfiscal</title>
+    <link rel="stylesheet" href="src/assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="src/assets/css/main.css">
+    <link rel="stylesheet" href="src/assets/font-awesome-4.7.0/css/font-awesome.min.css">
+  </head>
+  <body>
+  <h2 align="center">Impresion Fiscal- Python,PHP y VUE</h2>
+  <div id="app" style="margin-top: 80px">
+      <div class="col-md-9">
+        <div class="col-md-4">
+          <label>Razón Social</label>
+          <input type="text" class="form-control" placeholder="Nombre del cliente" v-model="dataclient.razonsocial">
+          <label>Cuit</label>
+          <input type="number" class="form-control" placeholder="Cuit del cliente" v-model="dataclient.cuit">
+        </div>
+        <div class="col-md-4">
+          <label>Domicilio</label>
+          <input type="text" class="form-control" placeholder="Domicilio del cliente" v-model="dataclient.domicilio">
+          <label>Condicion frente al IVA</label>
+          <select class="form-control" v-model="dataclient.iva_cliente">
+            <option value="1">Responsable Inscripto</option>
+            <option value="2">Responsable No Inscripto</option>
+            <option value="3">No Responsable</option>
+            <option value="4">Exento</option>
+            <option value="5">Consumidor Final</option>
+            <option value="6">Responsable Monotributo</option>
+            <option value="7">No Categorizado</option>
+            <option value="12">Pequeño Contribuyente Eventual</option>
+            <option value="13">Monotributista Social</option>
+            <option value="14">Pequeño contribuyente Eventual Social</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label>Tipo Pago</label>
+          <select class="form-control" v-model="dataclient.type_payment">
+            <option value="Efectivo">Efectivo</option>
+            <option value="Cuenta Corriente">Cuenta Corriente</option>
+          </select>
+          <div class="col-md-6">
+            <label>Entrega</label>
+            <input class="form-control" type="number" v-model="dataclient.entrega">
+          </div>
+          <div class="col-md-6">
+            <label>Tipo de Factura</label>
+            <select class="form-control" v-model="dataclient.typeinvoice" v-on:change="lastnumber()">
+              <option value="1">A</option>
+              <option value="6">B</option>
+              <option value="11">C</option>
+              <option value="83">D</option>
+            </select>
+          </div>
+        </div>
+        <div class="container col-md-12" style="margin-top:50px">
+        <form @submit.prevent="additem()">
+          <div class="col-md-4">
+            <label>Product</label>
+            <input v-model="newproduct" type="text" class="form-control" placeholder="Código del producto" required>
+          </div>
+          <div class="col-md-4">
+            <label>Descripción</label>
+            <input v-model="newdescription" type="text" class="form-control" placeholder="Descripcion del producto" required>
+          </div>
+          <div class="col-md-4">
+            <div class="col-md-4">
+              <label>Cantidad</label>
+              <input v-model="newquantity" type="number" class="form-control" placeholder="Cantidad" required>
+            </div>
+            <div class="col-md-6">
+              <label>Precio</label>
+              <input v-model="newprice" type="number" class="form-control" placeholder="Precio" required>
+            </div>
+            <div class="col-md-2">
+              <button type="submit" class="form-control btn btn-success" name="button" style="margin-top:25px">X</button>
+            </div>
+          </div>
+        </form>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Detalle</th>
+              <th style="width:5%;">Cantidad</th>
+              <th style="width:15%;text-align:right;">Precio</th>
+              <th style="width:5%;text-align:right;">Borrar</th>
+            </tr>
+          </thead>
+          <tbody v-for="(item, index) in items">
+            <tr style="margin: 0 auto;">
+              <td><label>{{item.product}} {{item.description}}</label></td>
+              <td class="text-right"><label>{{item.quantity}}</label></td>
+              <td class="text-right"><label>{{item.price}}</label></td>
+              <td><button @click="DeleteItem(index)" class="btn btn-danger">Borrar</button></td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr>
+              <td></td>
+              <td colspan="2" class="text-right">
+                <b>Sub Total</b>
+              </td>
+              <td class="text-right">$ {{subTotal}}</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td colspan="2" class="text-right">
+                <select class="" v-model="dataclient.iva">
+                  <option value="21">21%</option>
+                  <option value="10.5">10.5%</option>
+                  <option value="4">4 %</option>
+                </select>
+              </td>
+              <td class="text-right">$ {{ivamonto}}</td>
+            </tr>
+            <tr>
+              <td></td>
+              <td colspan="2" class="text-right">
+                <b>Total</b>
+              </td>
+              <td class="text-right">$ {{total}}</td>
+            </tr>
+          </tfoot>
+        </table>
+        </div>
+      </div>
+      <div class="col-md-3" style="text-align:center">
+        <div class="col-md-6">
+          <label>Nro. Factura:</label>{{nroinvoice}}
+        </div>
+        <div class="col-md-6">
+          <label>Estado:</label>{{status}}
+        </div><br><br>
+        <label>Puerto</label>
+        <input class="form-control" type="text" name="" value="COM2" v-model="Config.puerto">
+        <label>Modelo</label>
+        <select class="form-control" v-model="Config.modelo" id="">
+          <option value="epsonlx300">Epsonlx300</option>
+          <option value="epsonlx300+">Epsonlx300+</option>
+        </select><br><br>
+        <div class="col-md-4">
+          <button class="btn btn-success" type="button" name="button" v-on:click="printinvoice()">Imprimir</button>
+        </div>
+        <div class="col-md-4">
+          <button class="btn btn-warning" type="button" name="button" v-on:click="cierreZ()">Cierre Z</button>
+        </div>
+        <div class="col-md-4">
+          <button class="btn btn-danger" type="button" name="button" v-on:click="connect()">Reconectar.</button>
+        </div>
+      </div>
+    </div>
+    <script src="/dist/build.js"></script>
+    <script type="text/javascript" src="src/assets/js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="src/assets/js/bootstrap.min.js"></script>
+  </body>
+</html>
