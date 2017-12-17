@@ -44,7 +44,7 @@ new Vue({
       typeinvoice: 1,
       type_payment: 'Efectivo',
       entrega: null,
-      iva: 21
+      iva: 1.21
     },
     items: [],
     subTotal: 0,
@@ -53,7 +53,7 @@ new Vue({
   },
   methods: {
     connect(){
-       axios.post('http://localhost/PyFiscal/src/resources/process.php',
+       axios.post('http://localhost/PrinterFiscal/src/resources/process.php',
        {
          typeinvoice: this.dataclient.typeinvoice,
          operation: 'printinvoice'
@@ -78,7 +78,7 @@ new Vue({
        })
     },
     lastnumber(){
-       axios.post('http://localhost/PyFiscal/src/resources/process.php',
+       axios.post('http://localhost/PrinterFiscal/src/resources/process.php',
        {
          typeinvoice: this.dataclient.typeinvoice,
          operation: 'printinvoice'
@@ -109,6 +109,7 @@ new Vue({
         quantity:this.newquantity,
         price:this.newprice,
       });
+      this.calculate();
       this.showSuccessMsg({message: "Se agrego un articulo."});
       this.newproduct = null;
       this.newdescription = null;
@@ -118,11 +119,28 @@ new Vue({
     },
     DeleteItem(index){
       this.items.splice(index, 1);
+      this.calculate();
       this.showSuccessMsg({message: "Se elimino correctamente."});
+    },
+    calculate(){
+      var total=0;
+      var montoIva=0;
+      var subtotal=0
+      this.items.forEach(function(item) {
+          if (item.quantity && item.price){
+              total = parseFloat(total)+(parseInt(item.quantity)*parseFloat(item.price));
+          }
+      });
+
+      montoIva = total-total/this.dataclient.iva;
+      subtotal = total-montoIva;
+      this.subTotal = parseFloat(subtotal).toFixed(2);
+      this.ivamonto = parseFloat(montoIva).toFixed(2);
+      this.total = parseFloat(total).toFixed(2);
     },
     printinvoice(){
       if (this.status=='Connect') {
-        axios.post('http://localhost/PyFiscal/src/resources/process.php',{
+        axios.post('http://localhost/PrinterFiscal/src/resources/process.php',{
           dataclient: this.dataclient,
           items: this.items,
           operation: 'printinvoice'
@@ -140,7 +158,7 @@ new Vue({
       }
     },
     cierreZ(){
-       axios.get('http://localhost/PyFiscal/src/resources/process.php?cierrez',
+       axios.get('http://localhost/PrinterFiscal/src/resources/process.php?cierrez',
        {
          headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
        }

@@ -71,7 +71,7 @@
             </div>
             <div class="col-md-6">
               <label>Precio</label>
-              <input v-model="newprice" type="number" class="form-control" placeholder="Precio" required>
+              <input v-model="newprice" class="form-control" placeholder="Precio" required>
             </div>
             <div class="col-md-2">
               <button type="submit" class="form-control btn btn-success" name="button" style="margin-top:25px">X</button>
@@ -89,9 +89,9 @@
           </thead>
           <tbody v-for="(item, index) in items">
             <tr style="margin: 0 auto;">
-              <td><label>{{item.product}} {{item.description}}</label></td>
-              <td class="text-right"><label>{{item.quantity}}</label></td>
-              <td class="text-right"><label>{{item.price}}</label></td>
+              <td><input class="form-control" v-model="item.product+' '+item.description"></td>
+              <td class="text-right"><input class="form-control" v-model="item.quantity" v-on:keyup="calculate()"></td>
+              <td class="text-right"><input class="form-control" v-model="item.price" v-on:keyup="calculate()"></td>
               <td><button @click="DeleteItem(index)" class="btn btn-danger">Borrar</button></td>
             </tr>
           </tbody>
@@ -106,10 +106,10 @@
             <tr>
               <td></td>
               <td colspan="2" class="text-right">
-                <select class="" v-model="dataclient.iva">
-                  <option value="21">21%</option>
-                  <option value="10.5">10.5%</option>
-                  <option value="4">4 %</option>
+                <select class="" v-model="dataclient.iva" v-on:change="calculate()">
+                  <option value="1.21">21%</option>
+                  <option value="1.105">10.5%</option>
+                  <option value="1.4">4 %</option>
                 </select>
               </td>
               <td class="text-right">$ {{ivamonto}}</td>
